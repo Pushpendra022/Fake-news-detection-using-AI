@@ -1,20 +1,29 @@
-// backend/database.js - ENHANCED VERSION
+// backend/database.js - UPDATED FOR VERCEL & LOCALHOST
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 const fs = require('fs');
 
-const dbPath = path.join(__dirname, 'coredex.db');
+// ✅ FIX: Use /tmp directory in production (Vercel), local directory in development
+const isProduction = process.env.NODE_ENV === 'production';
+const dbPath = isProduction 
+  ? '/tmp/coredex.db'  // Vercel's writable directory
+  : path.join(__dirname, 'coredex.db'); // Local development
+
+console.log(`📁 Database path: ${dbPath}`);
+console.log(`🚀 Environment: ${isProduction ? 'Production' : 'Development'}`);
 
 // Ensure database directory exists
 const dbDir = path.dirname(dbPath);
 if (!fs.existsSync(dbDir)) {
+    console.log(`📂 Creating database directory: ${dbDir}`);
     fs.mkdirSync(dbDir, { recursive: true });
 }
 
 // Create database connection
 const db = new sqlite3.Database(dbPath, (err) => {
     if (err) {
-        console.error('Error opening database:', err.message);
+        console.error('❌ Error opening database:', err.message);
+        console.error('💡 If running on Vercel, make sure NODE_ENV=production is set');
     } else {
         console.log('✅ Connected to SQLite database');
         initializeDatabase();
@@ -23,6 +32,8 @@ const db = new sqlite3.Database(dbPath, (err) => {
 
 // Initialize database tables
 function initializeDatabase() {
+    console.log('🔄 Initializing database tables...');
+
     // Users table
     db.run(`CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -35,11 +46,9 @@ function initializeDatabase() {
         is_active BOOLEAN DEFAULT 1
     )`, (err) => {
         if (err) {
-            console.error('Error creating users table:', err);
+            console.error('❌ Error creating users table:', err);
         } else {
             console.log('✅ Users table ready');
-            
-            // Create default admin user if doesn't exist
             createDefaultAdmin();
         }
     });
@@ -53,10 +62,11 @@ function initializeDatabase() {
         analysis_data TEXT,
         credibility_score INTEGER,
         result TEXT,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users (id)
     )`, (err) => {
         if (err) {
-            console.error('Error creating analysis_history table:', err);
+            console.error('❌ Error creating analysis_history table:', err);
         } else {
             console.log('✅ Analysis history table ready');
         }
@@ -69,22 +79,17 @@ function initializeDatabase() {
         session_id TEXT,
         user_message TEXT NOT NULL,
         ai_response TEXT NOT NULL,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users (id)
     )`, (err) => {
         if (err) {
-            console.error('Error creating chat_history table:', err);
+            console.error('❌ Error creating chat_history table:', err);
         } else {
             console.log('✅ Chat history table ready');
-            // Add session_id column if it doesn't exist (for existing databases)
-            db.run(`ALTER TABLE chat_history ADD COLUMN session_id TEXT`, (alterErr) => {
-                if (alterErr && !alterErr.message.includes('duplicate column name')) {
-                    console.warn('Could not add session_id column:', alterErr.message);
-                }
-            });
         }
     });
 
-    // User sessions table for better session management
+    // User sessions table
     db.run(`CREATE TABLE IF NOT EXISTS user_sessions (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_id INTEGER NOT NULL,
@@ -94,7 +99,7 @@ function initializeDatabase() {
         FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
     )`, (err) => {
         if (err) {
-            console.error('Error creating user_sessions table:', err);
+            console.error('❌ Error creating user_sessions table:', err);
         } else {
             console.log('✅ User sessions table ready');
         }
@@ -109,14 +114,14 @@ function initializeDatabase() {
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )`, (err) => {
         if (err) {
-            console.error('Error creating system_settings table:', err);
+            console.error('❌ Error creating system_settings table:', err);
         } else {
             console.log('✅ System settings table ready');
             initializeDefaultSettings();
         }
     });
 
-    // API logs table for monitoring
+    // API logs table
     db.run(`CREATE TABLE IF NOT EXISTS api_logs (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         endpoint TEXT NOT NULL,
@@ -130,23 +135,30 @@ function initializeDatabase() {
         FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE SET NULL
     )`, (err) => {
         if (err) {
-            console.error('Error creating api_logs table:', err);
+            console.error('❌ Error creating api_logs table:', err);
         } else {
             console.log('✅ API logs table ready');
         }
     });
 
     // Create indexes for better performance
-    db.run(`CREATE INDEX IF NOT EXISTS idx_analysis_user_id ON analysis_history(user_id)`, (err) => {
-        if (err) console.error('Error creating index:', err);
-    });
-    
-    db.run(`CREATE INDEX IF NOT EXISTS idx_analysis_created_at ON analysis_history(created_at)`, (err) => {
-        if (err) console.error('Error creating index:', err);
-    });
-    
-    db.run(`CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)`, (err) => {
-        if (err) console.error('Error creating index:', err);
+    const indexes = [
+        'CREATE INDEX IF NOT EXISTS idx_analysis_user_id ON analysis_history(user_id)',
+        'CREATE INDEX IF NOT EXISTS idx_analysis_created_at ON analysis_history(created_at)',
+        'CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)',
+        'CREATE INDEX IF NOT EXISTS idx_chat_user_id ON chat_history(user_id)',
+        'CREATE INDEX IF NOT EXISTS idx_sessions_token ON user_sessions(session_token)'
+    ];
+
+    let indexesCreated = 0;
+    indexes.forEach((sql, index) => {
+        db.run(sql, (err) => {
+            if (err) console.error(`❌ Error creating index ${index + 1}:`, err);
+            indexesCreated++;
+            if (indexesCreated === indexes.length) {
+                console.log('✅ All database indexes created');
+            }
+        });
     });
 }
 
@@ -163,7 +175,7 @@ function createDefaultAdmin() {
     // Check if admin already exists
     db.get('SELECT id FROM users WHERE email = ?', [defaultAdmin.email], (err, row) => {
         if (err) {
-            console.error('Error checking admin user:', err);
+            console.error('❌ Error checking admin user:', err);
             return;
         }
 
@@ -173,15 +185,17 @@ function createDefaultAdmin() {
                 [defaultAdmin.name, defaultAdmin.email, defaultAdmin.password, defaultAdmin.role],
                 function(err) {
                     if (err) {
-                        console.error('Error creating default admin:', err);
+                        console.error('❌ Error creating default admin:', err);
                     } else {
                         console.log('✅ Default admin user created');
                         console.log('📧 Email: admin@coredex.ai');
                         console.log('🔑 Password: admin123');
-                        console.log('⚠️  Please change the default password immediately!');
+                        console.log('⚠️  Please change the default password in production!');
                     }
                 }
             );
+        } else {
+            console.log('✅ Admin user already exists');
         }
     });
 }
@@ -221,6 +235,7 @@ function initializeDefaultSettings() {
         }
     ];
 
+    let settingsInserted = 0;
     defaultSettings.forEach(setting => {
         db.run(
             `INSERT OR IGNORE INTO system_settings (setting_key, setting_value, description) 
@@ -228,7 +243,11 @@ function initializeDefaultSettings() {
             [setting.key, setting.value, setting.description],
             (err) => {
                 if (err) {
-                    console.error('Error inserting default setting:', err);
+                    console.error('❌ Error inserting default setting:', err);
+                }
+                settingsInserted++;
+                if (settingsInserted === defaultSettings.length) {
+                    console.log('✅ All default settings initialized');
                 }
             }
         );
@@ -274,7 +293,7 @@ const dbUtils = {
             [endpoint, method, userId, statusCode, responseTime, userAgent, ipAddress],
             (err) => {
                 if (err) {
-                    console.error('Error logging API request:', err);
+                    console.error('❌ Error logging API request:', err);
                 }
             }
         );
@@ -297,7 +316,7 @@ const dbUtils = {
             Object.keys(queries).forEach(key => {
                 db.get(queries[key], [], (err, row) => {
                     if (err) {
-                        console.error(`Error getting ${key} count:`, err);
+                        console.error(`❌ Error getting ${key} count:`, err);
                         stats[key] = 0;
                     } else {
                         stats[key] = row.count;
@@ -312,54 +331,46 @@ const dbUtils = {
         });
     },
 
-    // Backup database (simplified version)
-    backupDatabase: (backupPath) => {
+    // Get database file info
+    getDatabaseInfo: () => {
         return new Promise((resolve, reject) => {
-            const backupDB = new sqlite3.Database(backupPath);
-            
-            db.backup(backupDB, {
-                progress: (status) => {
-                    console.log(`Backup progress: ${status.remaining} pages remaining`);
-                }
-            }, (err) => {
+            if (!fs.existsSync(dbPath)) {
+                resolve({ exists: false, path: dbPath, size: 0 });
+                return;
+            }
+
+            try {
+                const stats = fs.statSync(dbPath);
+                resolve({
+                    exists: true,
+                    path: dbPath,
+                    size: stats.size,
+                    modified: stats.mtime,
+                    environment: isProduction ? 'production' : 'development'
+                });
+            } catch (err) {
+                reject(err);
+            }
+        });
+    },
+
+    // Test database connection
+    testConnection: () => {
+        return new Promise((resolve, reject) => {
+            db.get('SELECT 1 as test', (err, row) => {
                 if (err) {
                     reject(err);
                 } else {
-                    backupDB.close();
-                    resolve();
+                    resolve({ success: true, message: 'Database connection successful', test: row.test });
                 }
             });
-        });
-    },
-
-    // Optimize database
-    optimizeDatabase: () => {
-        return new Promise((resolve, reject) => {
-            db.run('VACUUM', (err) => {
-                if (err) reject(err);
-                else resolve();
-            });
-        });
-    },
-
-    // Clean old data
-    cleanOldData: (days = 30) => {
-        return new Promise((resolve, reject) => {
-            db.run(
-                'DELETE FROM analysis_history WHERE created_at < datetime("now", ?)',
-                [`-${days} days`],
-                function(err) {
-                    if (err) reject(err);
-                    else resolve(this.changes);
-                }
-            );
         });
     }
 };
 
 // Error handling
 db.on('error', (err) => {
-    console.error('Database error:', err);
+    console.error('❌ Database error:', err);
 });
 
 // Graceful shutdown
@@ -367,7 +378,7 @@ process.on('SIGINT', () => {
     console.log('\n🔄 Closing database connection...');
     db.close((err) => {
         if (err) {
-            console.error('Error closing database:', err);
+            console.error('❌ Error closing database:', err);
             process.exit(1);
         } else {
             console.log('✅ Database connection closed');
@@ -376,7 +387,9 @@ process.on('SIGINT', () => {
     });
 });
 
+// Export both db and utilities
 module.exports = {
     db,
+    dbPath, // Export the path for debugging
     ...dbUtils
 };

@@ -9,47 +9,7 @@ const router = express.Router();
 
 const JWT_SECRET = process.env.JWT_SECRET || "coredex_secret";
 
-/* ------------------------------------------------
-   ✅ AUTH: REGISTER
---------------------------------------------------- */
-router.post("/auth/register", async (req, res) => {
-  const { name, email, password } = req.body;
 
-  if (!name || !email || !password) {
-    return res.status(400).json({ error: "All fields required" });
-  }
-
-  try {
-    db.get("SELECT id FROM users WHERE email = ?", [email], (err, row) => {
-      if (err) return res.status(500).json({ error: "Database error" });
-      if (row) return res.status(400).json({ error: "Email exists" });
-
-      const hashed = bcrypt.hashSync(password, 10);
-
-      db.run(
-        "INSERT INTO users (name, email, password) VALUES (?, ?, ?)",
-        [name, email, hashed],
-        function (err) {
-          if (err) return res.status(500).json({ error: "Create user failed" });
-
-          const token = jwt.sign(
-            { userId: this.lastID, email },
-            JWT_SECRET,
-            { expiresIn: "7d" }
-          );
-
-          res.json({
-            success: true,
-            token,
-            user: { id: this.lastID, name, email, role: "user" },
-          });
-        }
-      );
-    });
-  } catch (e) {
-    res.status(500).json({ error: "Server error" });
-  }
-});
 
 /* ------------------------------------------------
    ✅ AUTH: LOGIN
