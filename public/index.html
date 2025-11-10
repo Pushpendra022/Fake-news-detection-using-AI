@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>COREDEX — AI-Powered Detection Solutions</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- connect css page to this html one -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- this is nevbar -->
+  <nav id="navbar" class="navbar" role="navigation" aria-label="Main">
+    <div class="nav-container">
+      <a href="#home" class="nav-logo" aria-label="CORDEX home">
+
+        <!-- this is for the design navbar and make it transparent -->
+
+        <svg width="36" height="36" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <defs>
+            <linearGradient id="g1" x1="0" x2="1" y1="0" y2="1">
+              <stop offset="0" stop-color="#4f46e5"/>
+              <stop offset="1" stop-color="#ff7a59"/>
+            </linearGradient>
+            <filter id="s" x="-50%" y="-50%" width="200%" height="200%">
+              <feDropShadow dx="0" dy="6" stdDeviation="12" flood-color="#000" flood-opacity="0.25"/>
+            </filter>
+          </defs>
+          <g filter="url(#s)">
+            <circle cx="32" cy="32" r="28" fill="url(#g1)"/>
+            <path d="M42 20c-6-4-14-3-20 1" stroke="rgba(255,255,255,0.95)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M43 44c-6 4-14 4-20 0" stroke="rgba(255,255,255,0.9)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+          </g>
+        </svg>
+        <span class="brand">COREDEX AI</span> 
+      </a>
+
+      <ul class="nav-menu" role="menubar">
+        <li><a class="nav-link" href="#features">Features</a></li>
+
+        <li class="nav-item" id="solutionsItem">
+          <button id="solutionsToggle" class="nav-link dropdown-toggle" aria-expanded="false" aria-haspopup="true">
+            Solutions <i class="fas fa-chevron-down"></i>
+          </button>
+          <div class="dropdown-menu" role="menu" aria-hidden="true">
+            <a class="dropdown-item" href="#journalists">For Journalists</a>
+            <a class="dropdown-item" href="#educators">For Educators</a>
+            <a class="dropdown-item" href="#businesses">For Businesses</a>
+            <a class="dropdown-item" href="#individuals">For Individuals</a>
+          </div>
+        </li>
+
+        <li><a class="nav-link" href="#team">Team</a></li>
+        <li><a class="nav-link" href="#contact">Contact</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <button id="themeToggle" class="icon-btn" aria-label="Toggle theme"><i id="themeIcon" class="fas fa-moon"></i></button>
+
+        <!--login and sign up buttons in navbar-->
+        <div id="navAuth" class="nav-auth">
+          <button id="loginBtn" class="auth-btn" aria-haspopup="dialog"><i class="fas fa-sign-in-alt"></i><span class="btn-text">Login</span></button>
+          <button id="signupBtn" class="auth-btn outline"><i class="fas fa-user-plus"></i><span class="btn-text">Sign Up</span></button>
+        </div>
+
+        <button id="mobileToggle" class="mobile-btn" aria-label="Open mobile menu"><i class="fas fa-bars"></i></button>
+      </div>
+    </div>
+  </nav>
+
+  <!--this si a code for small screens like mobile and teblets -->
+  <div id="mobileMenu" class="mobile-menu" aria-hidden="true">
+    <div class="mobile-inner">
+      <button id="mobileClose" class="mobile-close" aria-label="Close menu"><i class="fas fa-times"></i></button>
+      <nav class="mobile-nav">
+        <a href="#features" class="mobile-link">Features</a>
+        <button id="mobileSolutions" class="mobile-link mobile-toggle">Solutions <i class="fas fa-chevron-down"></i></button>
+        <div id="mobileSolutionsList" class="mobile-submenu">
+          <a href="#journalists">For Journalists</a>
+          <a href="#educators">For Educators</a>
+          <a href="#businesses">For Businesses</a>
+          <a href="#individuals">For Individuals</a>
+        </div>
+        <a href="#team" class="mobile-link">Team</a>
+        <a href="#contact" class="mobile-link">Contact</a>
+      </nav>
+      <div class="mobile-actions">
+        <button id="mobileThemeToggle" class="icon-btn" aria-label="Toggle theme"><i id="mobileThemeIcon" class="fas fa-moon"></i></button>
+        <button id="mobileLogin" class="btn">Login</button>
+        <button id="mobileSignup" class="btn outline">Sign Up</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hero section  this is for the front what user will see first -->
+  <header id="home" class="hero">
+    <div class="hero-inner container">
+      <div class="hero-left">
+        <div class="hero-badge">Trusted by 10,000+ organizations worldwide</div>
+
+        <h1 class="hero-title">AI-Powered <span class="highlight">Truth Detection</span> for the Digital Age</h1>
+
+        <p class="hero-sub">Advanced artificial intelligence that analyzes news credibility with 98.7% accuracy. Combat misinformation with cutting-edge technology.</p>
+
+        <div class="hero-metrics">
+          <div class="metric">
+            <div class="value">98.7%</div>
+            <div class="label">Accuracy Rate</div>
+          </div>
+          <div class="metric">
+            <div class="value">2.1M+</div>
+            <div class="label">Articles Analyzed</div>
+          </div>
+          <div class="metric">
+            <div class="value">50ms</div>
+            <div class="label">Average Response</div>
+          </div>
+        </div>
+
+        <div class="hero-ctas">
+          <button id="startTrial" class="btn btn-primary"><i class="fas fa-rocket"></i> Start Free Trial</button>
+          <button id="watchDemo" class="btn btn-ghost"><i class="fas fa-play-circle"></i> Watch Demo</button>
+        </div>
+
+        <div class="trusted-logos">
+          <span>Trusted by industry leaders:</span>
+          <div class="logos">
+            <span>TechNews</span>
+            <span>MediaWatch</span>
+            <span>TruthFoundation</span>
+            <span>EduTech Global</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-right">
+        <!-- this is for floating icons insinde the right side box  -->
+        <div class="floating-icons">
+          <div class="float item1" >
+            <i class="fas fa-brain"></i>
+          </div>
+          <div class="float item2" >
+            <i class="fas fa-shield-alt"></i>
+          </div>
+          <div class="float item3" >
+            <i class="fas fa-file-pdf"></i>
+          </div>
+         
+          <div class="float item5" >
+            <i class="fas fa-network-wired"></i>
+          </div>
+        </div>
+
+          <!-- floating icons box content -->
+        <div class="hero-card">
+          <svg viewBox="0 0 300 200" preserveAspectRatio="none" class="hero-art">
+            <defs>
+              <linearGradient id="hg" x1="0" x2="1" y1="0" y2="1">
+                <stop offset="0" stop-color="#4f46e5"/>
+                <stop offset="1" stop-color="#ff7a59"/>
+              </linearGradient>
+            </defs>
+            <rect x="0" y="0" width="300" height="200" rx="16" ry="16" fill="url(#hg)"/>
+          </svg>
+          
+          <div class="hero-card-content">
+            <h3>Live Analysis Preview</h3>
+            <p>Real-time credibility assessment</p>
+            
+            <div class="hero-card-stats">
+              <div class="stat">
+                <span class="stat-value">94%</span>
+                <span class="stat-label">Accuracy</span>
+              </div>
+              <div class="stat">
+                <span class="stat-value">0.8s</span>
+                <span class="stat-label">Speed</span>
+              </div>
+              <div class="stat">
+                <span class="stat-value">27</span>
+                <span class="stat-label">Factors</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+       
+        
+      
+    </div>
+  </header>
+
+  <!-- this is what on the hero screen-->
+  <section id="features" class="section features-section">
+    <div class="container">
+      <h2 class="section-title">AI-Powered Truth Detection Solutions</h2>
+      <p class="section-sub">Advanced machine learning algorithms that analyze multiple dimensions of content credibility</p>
+
+      <div class="solutions-grid">
+        <div class="solution-card">
+          <div class="icon"><i class="fas fa-language"></i></div>
+          <h3>Linguistic Analysis</h3>
+          <p>Advanced NLP algorithms detect patterns, sentiment, and linguistic cues associated with misinformation.</p>
+        </div>
+
+        <div class="solution-card">
+          <div class="icon"><i class="fas fa-search"></i></div>
+          <h3>Source Verification</h3>
+          <p>Cross-reference information with trusted databases and verify source credibility in real-time.</p>
+        </div>
+
+        <div class="solution-card">
+          <div class="icon"><i class="fas fa-network-wired"></i></div>
+          <h3>Network Analysis</h3>
+          <p>Examine information spread patterns and identify coordinated misinformation campaigns.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- advanced feature cards -->
+  <section class="section features-advanced">
+    <div class="container">
+      <h2 class="section-title">Advanced Features for Modern Truth Detection</h2>
+      <p class="section-sub">Powered by cutting-edge AI technology and comprehensive data analysis</p>
+
+      <div class="feature-cards">
+        <div class="feature-card">
+          <div class="ficon"><i class="fas fa-robot"></i></div>
+          <h4>AI-Powered Analysis</h4>
+          <p>Natural language processing and pattern recognition trained on millions of verified articles.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="ficon"><i class="fas fa-bolt"></i></div>
+          <h4>Real-time Verification</h4>
+          <p>Live URL checking, instant text analysis, and batch processing.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="ficon"><i class="fas fa-database"></i></div>
+          <h4>Comprehensive Database</h4>
+          <p>Extensive repository of verified sources and historical fact-checking data.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="ficon"><i class="fas fa-chart-bar"></i></div>
+          <h4>Detailed Analytics</h4>
+          <p>Credibility scorecards, factor breakdowns, and trend tracking.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- this section is for our team  -->
+  <section id="team" class="section team-section">
+    <div class="container">
+      <h2 class="section-title">Meet Our Expert Team</h2>
+      <p class="section-sub">Combining decades of experience in AI research, cybersecurity, and media analysis</p>
+
+      <div class="team-grid">
+        <div class="team-card">
+          <div class="avatar">PS</div>
+          <h4>Pushpendra Solanki</h4>
+          <p class="role">Creator & Lead Developer</p>
+          <p class="bio">Full-stack developer with expertise in AI integration and web technologies. (Will be updated in future)</p>
+        </div>
+
+        <div class="team-card">
+          <div class="avatar">SR</div>
+          <h4>Shubham Raiya</h4>
+          <p class="role">AI Researcher</p>
+          <p class="bio">Specialized in machine learning models and natural language processing. (Will be updated in future)</p>
+        </div>
+
+        <div class="team-card">
+          <div class="avatar">CG</div>
+          <h4>Chirag Goswami</h4>
+          <p class="role">Database Architect</p>
+          <p class="bio">Expert in database design, optimization, and data management systems. (Will be updated in future)</p>
+        </div>
+
+        <div class="team-card">
+          <div class="avatar">CR</div>
+          <h4>Chetan Raj Solanki</h4>
+          <p class="role">Quality Assurance Tester</p>
+          <p class="bio">Ensuring product quality through comprehensive testing methodologies. (Will be updated in future)</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- simple card details after the team section-->
+  <section id="contact" class="section cta-section">
+    <div class="container cta-inner">
+      <h2>Ready to Combat Fake News?</h2>
+      <p>Join thousands of users who trust CORDEX for accurate news verification</p>
+      <div class="cta-actions">
+        <button id="ctaStart" class="btn btn-primary"><i class="fas fa-rocket"></i> Start Free Trial</button>
+        <button id="ctaDocs" class="btn btn-outline"><i class="fas fa-book"></i> Read Documentation</button>
+      </div>
+      <div class="cta-features">
+        <span>No credit card required</span>
+        <span>14-day free trial</span>
+        <span>Cancel anytime</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- this design footer and includes all  -->
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-about">
+        <h3>CORDEX</h3>
+        <p>Fighting misinformation with advanced artificial intelligence and machine learning technology.</p>
+      </div>
+
+      <div class="footer-col">
+        <h4>Product</h4>
+        <ul>
+          <li><a href="#features">Features</a></li>
+          <li><a href="#pricing">Pricing</a></li>
+          <li><a href="#api">API</a></li>
+          <li><a href="#contact">Documentation</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="#team">About</a></li>
+          <li><a href="#team">Blog</a></li>
+          <li><a href="#team">Careers</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="#privacy">Privacy Policy</a></li>
+          <li><a href="#terms">Terms of Service</a></li>
+          <li><a href="#cookies">Cookie Policy</a></li>
+          <li><a href="#gdpr">GDPR</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <small>© 2025 CORDEX. All rights reserved.</small>
+    </div>
+  </footer>
+
+  <!-- this is for the login model and it will show how login model looks like -->
+  <div id="loginModal" class="modal" aria-hidden="true">
+    <div class="modal-panel">
+      <button class="modal-close" id="closeLogin" aria-label="Close"><i class="fas fa-times"></i></button>
+      <h3>Welcome back</h3>
+
+      <div class="social-row">
+        <button class="social google"><i class="fab fa-google"></i> Continue with Google</button>
+        <button class="social"><i class="fab fa-facebook"></i> Continue with Facebook</button>
+      </div>
+
+      <form id="loginForm" class="auth-form">
+        <input id="loginEmail" type="email" placeholder="Email" required />
+        <input id="loginPassword" type="password" placeholder="Password" required minlength="6" />
+        <div class="modal-actions">
+          <button type="submit" class="btn btn-primary">Login</button>
+          <button type="button" id="openSignupFromLogin" class="btn outline">Sign Up</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!--this is for the signup model and it will show how login model looks like -->
+  <div id="signupModal" class="modal" aria-hidden="true">
+    <div class="modal-panel">
+      <button class="modal-close" id="closeSignup" aria-label="Close"><i class="fas fa-times"></i></button>
+      <h3>Create an account</h3>
+
+      <div class="social-row">
+        <button class="social google"><i class="fab fa-google"></i> Continue with Google</button>
+        <button class="social"><i class="fab fa-apple"></i> Continue with Apple</button>
+      </div>
+
+      <form id="signupForm" class="auth-form">
+        <input id="signupName" type="text" placeholder="Full name" required />
+        <input id="signupEmail" type="email" placeholder="Email" required />
+        <input id="signupPassword" type="password" placeholder="Password (min 6 chars)" required minlength="6" />
+        <div class="modal-actions">
+          <button type="submit" class="btn btn-primary">Create account</button>
+          <button type="button" id="openLoginFromSignup" class="btn outline">Login</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+
+  <!-- this is to connect java script page to this html -->
+  <script src="script.js"></script>
+  <script src="/js/analyze-client.js"></script>
+
+</body>
+</html>

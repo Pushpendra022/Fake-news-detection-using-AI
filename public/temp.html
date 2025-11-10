@@ -1,0 +1,447 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <style>
+    /* ===== GLOBAL FIXES ===== */
+    *, *::before, *::after { box-sizing: border-box; }
+    :root{
+      --bg: #f3f4f6;
+      --card: #ffffff;
+      --muted: #6b7280;
+      --text: #0f172a;
+      --accent: #6366f1;
+      --success: #10b981;
+      --danger: #ef4444;
+      --glass: rgba(15,23,42,0.03);
+    }
+    [data-theme="dark"]{
+      --bg:#0b1220;
+      --card:#0f1724;
+      --muted:#9aa5b1;
+      --text:#e6eef6;
+      --accent:#7c9cff;
+      --glass: rgba(255,255,255,0.03);
+    }
+
+    html,body{
+      height:100%;
+      margin:0;
+      font-family:Inter,system-ui,Arial,sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      /* don't allow horizontal scrolling */
+      overflow-x:hidden;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+    }
+
+    /* Layout base - force shrink on small screens */
+    .wrap{
+      display:grid;
+      grid-template-columns:260px 1fr;
+      min-height:100vh;
+      overflow-x:hidden;
+      width:100%;
+      max-width:100%;
+    }
+    .sidebar{
+      background:var(--card);
+      padding:18px;
+      border-right:1px solid var(--glass);
+      position:relative;
+      min-height:100vh;
+      overflow-x:hidden;
+      width:260px;
+      max-width:100%;
+    }
+    .nav{display:flex;flex-direction:column;gap:8px}
+      background:none;border:0;padding:10px;border-radius:8px;text-align:left;
+      cursor:pointer;color:var(--text);font-weight:600;transition: all 0.3s ease;
+      white-space:normal;
+    }
+    .main{
+      padding:18px;
+      overflow-x:hidden;
+      width:100%;
+      max-width:100%;
+      min-width:0;
+    }
+    .controls{display:flex;gap:10px;align-items:center;min-width:0}
+    .card{
+      background:var(--card);
+      padding:16px;
+      border-radius:12px;
+      box-shadow:0 4px 20px var(--glass);
+      overflow-x:hidden;
+      width:100%;
+      max-width:100%;
+      min-width:0;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:12px;
+      width:100%;
+      max-width:100%;
+    }
+    .big{font-size:28px;font-weight:700}
+    textarea{
+      width:100%;
+      min-height:160px;
+      padding:12px;
+      border-radius:8px;
+      border:1px solid var(--glass);
+      background:transparent;
+      color:var(--text);
+      overflow-x:hidden;
+      resize:vertical;
+    }
+    .btn{
+      background:linear-gradient(90deg,var(--accent),#8b5cf6);
+      color:white;padding:10px 14px;border-radius:8px;border:0;cursor:pointer;font-weight:700;
+      transition: all 0.3s ease;
+    }
+    .btn:hover{transform: translateY(-2px); box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);}
+    .btn.alt{background:transparent;border:1px solid var(--glass);color:var(--text)}
+    .btn.alt:hover{background: var(--glass);}
+    .result.real{background:rgba(16,185,129,0.08);border-left:6px solid var(--success)}
+    .result.fake{background:rgba(239,68,68,0.06);border-left:6px solid var(--danger)}
+      padding:10px;border-radius:8px;border:1px solid var(--glass);
+      background:var(--card);display:flex;justify-content:space-between;align-items:center;overflow-x:hidden;min-width:0;
+    }
+    .flex{display:flex;gap:10px;align-items:center;min-width:0}
+    .muted{color:var(--muted)}
+
+      display: none;
+      position: fixed;
+      left: 15px;
+      z-index: 1001;
+      background: var(--card);
+      border: 1px solid var(--glass);
+      border-radius: 8px;
+      padding: 10px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      transition: all 0.3s ease;
+    }
+
+
+      display: block;
+      width: 20px;
+      height: 2px;
+      background: var(--text);
+      margin: 3px 0;
+      transition: all 0.3s ease;
+    }
+
+      transform: rotate(-45deg) translate(-5px, 5px);
+    }
+      transform: rotate(45deg) translate(-5px, -5px);
+    }
+
+    .hover-zone{
+      display:none;
+      position:fixed;
+      left:0;
+      width:20px;
+      height:100vh;
+      background:linear-gradient(90deg, rgba(99,102,241,0.1), transparent);
+      z-index:999;
+      pointer-events:none;
+    }
+
+    /* Make sure inline-style chatMessages can't overflow */
+    #chatMessages, #chatInput {
+      max-width:100%;
+      width:100%;
+      box-sizing:border-box;
+      overflow-x:hidden;
+      min-width:0;
+    }
+
+    .main > section .card > div[style*="display:flex"] > input {
+      min-width: 0;
+    }
+
+    /* ===========================================================
+       LARGE TABLETS / SMALL LAPTOPS
+    =========================================================== */
+    @media (max-width: 1024px) {
+      .sidebar { width: 220px; }
+      .main { padding: 16px; }
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+      }
+      .grid { grid-template-columns: repeat(2,1fr); } /* better fit on large tablets */
+    }
+
+    /* ===========================================================
+       TABLETS & MOBILE LANDSCAPE
+    =========================================================== */
+    @media (max-width: 768px) {
+
+
+      .sidebar {
+        position: fixed;
+        left: -260px;
+        height: 100vh;
+        z-index: 1000;
+        width: 260px;
+        transition: left 0.3s ease;
+        background: var(--card);
+      }
+      .sidebar.active { left: 0; }
+
+      .wrap { grid-template-columns: 1fr; min-height: 100vh; }
+
+      .main {
+        padding: 12px;
+        margin-left: 0;
+        width: 100%;
+      }
+
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+        padding: 12px;
+        width: 100%;
+      }
+
+      .nav { gap: 6px; }
+
+        padding: 12px;
+        font-size: 16px;
+        width: 100%;
+        text-align: left;
+      }
+
+      /* Cards & grids */
+      .grid { grid-template-columns: 1fr; gap: 8px; }
+
+      .big { font-size: 24px; }
+
+      /* Inputs */
+      textarea {
+        min-height: 120px;
+        padding: 8px;
+        font-size: 16px;
+        resize: vertical;
+      }
+
+      input[type="url"] {
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid var(--glass);
+        background:transparent;
+        color:var(--text);
+        width:100%;
+        max-width:100%;
+      }
+
+      .btn, .btn.alt {
+        padding: 10px 14px;
+        font-size: 14px;
+        width: 100%;
+      }
+
+      .card .btn,
+      .card .btn.alt,
+      .card .flex .btn,
+      .card .flex .btn.alt {
+        display: block;
+        width: 100%;
+      }
+
+      /* Flex containers collapse */
+      .flex,
+      .controls {
+        flex-direction: column;
+        gap: 8px;
+        width: 100%;
+        text-align: left;
+      }
+
+      .controls .card {
+        width: 100%;
+        text-align: center;
+      }
+
+      #chatMessages {
+        height: 300px !important;
+        padding: 12px !important;
+        max-width: 100%;
+        overflow-x: hidden;
+      }
+      #chatInput {
+        flex: 1;
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid var(--glass);
+        background: transparent;
+        color: var(--text);
+        font-size: 16px;
+        min-width:0;
+      }
+
+      .result {
+        padding: 12px;
+        border-radius: 8px;
+        max-width: 100%;
+        word-wrap: break-word;
+      }
+
+    }
+
+    /* ===========================================================
+       SMALL PHONES
+    =========================================================== */
+    @media (max-width: 480px) {
+      .sidebar {
+        width: 100%;
+        left: -100%;
+        padding: 12px;
+      }
+      .sidebar.active { left: 0; }
+
+      .main {
+        padding: 8px;
+      }
+
+        padding: 8px;
+      }
+
+      .card {
+        padding: 8px;
+      }
+
+        font-size: 14px;
+        padding: 10px;
+      }
+
+      .big { font-size: 20px; }
+
+      .btn {
+        font-size: 13px;
+        padding: 8px 10px;
+      }
+
+      textarea {
+        font-size: 14px;
+        min-height: 100px;
+      }
+
+      .brand { font-size: 16px; }
+      .nav { gap: 4px; }
+
+      #chatMessages { height: 250px !important; padding: 8px !important; }
+      #chatInput { font-size: 14px; padding: 8px; }
+
+    }
+
+    /* Extra guard: ensure no element forces page wider than viewport */
+    html, body, .wrap, .main, .card, .grid, #chatMessages {
+      max-width: 100%;
+      overflow-x: hidden;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap" id="app" data-theme="light">
+    <!-- Hover zone for mobile sidebar trigger -->
+    <div class="hover-zone"></div>
+
+      <span></span>
+      <span></span>
+      <span></span>
+
+    <aside class="sidebar">
+      <div class="nav">
+      </div>
+
+
+    </aside>
+
+    <main class="main">
+        <div>
+          <h2 style="margin:0">Dashboard</h2>
+        </div>
+        <div class="controls">
+          <div class="card" style="padding:8px 12px">
+            <small class="muted">Live</small><div id="liveBadge" style="font-weight:700">Connected</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Overview -->
+      <section id="section-overview">
+        <div class="grid">
+          <div class="card">
+            <div class="muted">Analyses</div>
+            <div class="big" id="statTotalAnalysis">0</div>
+          </div>
+          <div class="card">
+            <div class="muted">Fake %</div>
+            <div class="big" id="statFakePercent">0%</div>
+          </div>
+        </div>
+
+          </div>
+          <div id="quickResult" class="result" style="display:none"></div>
+        </div>
+      </section>
+
+      <!-- Analyze -->
+      <section id="section-analyze" style="display:none">
+        <div class="card">
+          <label class="muted">Paste the full article or URL (text currently supported)</label>
+          <textarea id="analyzeContent" placeholder="Full article text..."></textarea>
+            <input id="analyzeUrl" type="url" placeholder="Or enter URL..." style="flex:1;padding:10px;border-radius:8px;border:1px solid var(--glass);background:transparent;color:var(--text)">
+          </div>
+          <div id="analyzeResult" class="result" style="display:none"></div>
+        </div>
+      </section>
+
+        <div class="card">
+          </div>
+        </div>
+      </section>
+
+      <section id="section-chat" style="display:none">
+        <div class="card">
+          </div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <input id="chatInput" type="text" placeholder="Ask me anything about news analysis..." style="flex:1;padding:10px;border-radius:8px;border:1px solid var(--glass);background:transparent;color:var(--text)">
+          </div>
+        </div>
+      </section>
+
+      <!-- Account -->
+      <section id="section-account" style="display:none">
+        <div class="card">
+          <div style="display:flex;gap:12px;align-items:center">
+            <div style="width:64px;height:64px;border-radius:12px;background:var(--glass);display:flex;align-items:center;justify-content:center;font-weight:700" id="avatarBox">U</div>
+            <div>
+              <div id="accountName" style="font-weight:700">User</div>
+              <div class="muted" id="accountEmail">email@example.com</div>
+            </div>
+          </div>
+
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+    <svg width="24" height="24" fill="white" viewBox="0 0 24 24">
+      <path d="M12 2C6.48 2 2 6.48 2 12c0 1.54.36 3.05 1.05 4.42L2 22l5.58-1.05C9.95 21.64 11.46 22 13 22h7c1.1 0 2-.9 2-2V12c0-5.52-4.48-10-10-10zM8 12h2v2H8v-2zm4 0h2v2h-2v-2zm4 0h2v2h-2v-2z"/>
+    </svg>
+  </div>
+
+  <script src="/js/dashboard-app.js"></script>
+</body>
+</html>

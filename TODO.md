@@ -1,0 +1,7 @@
+- [x] Add event listeners for showAnalysisHistoryBtn and showChatHistoryBtn to toggle currentHistoryType and active classes
+- [x] Modify loadHistory() to conditionally load analysis or chat history based on currentHistoryType
+- [x] For chat history, fetch sessions and display in historyList with delete buttons
+- [x] Update clearHistoryBtn to clear based on currentHistoryType (analysis or chat)
+- [x] Update refreshHistoryBtn to reload based on currentHistoryType
+- [x] Test the functionality after changes (server started successfully, browser tool disabled but changes implemented)
+- [x] Add "View" button for each chat session to load and continue the conversation
